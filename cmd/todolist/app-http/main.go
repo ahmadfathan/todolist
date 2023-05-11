@@ -24,6 +24,30 @@ import (
 	todoRepo "github.com/ahmadfathan/todolist/internal/repo/todo"
 )
 
+var (
+	createTableActivities = `
+								CREATE TABLE IF NOT EXISTS activities (
+									activity_id bigint NOT NULL AUTO_INCREMENT,
+									title varchar(100) NOT NULL,
+									email varchar(100) NOT NULL,
+									created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+									updated_at timestamp NULL DEFAULT NULL,
+									PRIMARY KEY (activity_id)
+								)`
+
+	createTableTodos = `
+								CREATE TABLE IF NOT EXISTS todos (
+									todo_id bigint NOT NULL AUTO_INCREMENT,
+									activity_group_id bigint NOT NULL,
+									title varchar(100) NOT NULL,
+									priority varchar(16) NOT NULL,
+									is_active tinyint(1) DEFAULT NULL,
+									created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+									updated_at timestamp NULL DEFAULT NULL,
+									PRIMARY KEY (todo_id)
+								)`
+)
+
 func main() {
 
 	appConfig := config.GetAppConfig()
@@ -51,6 +75,9 @@ func startApp(appConfig config.AppConfig) error {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	db.MustExec(createTableActivities)
+	db.MustExec(createTableTodos)
 
 	// create activity repo
 	activityRepo, err := activityRepo.New(db)
